@@ -2,7 +2,22 @@ import numpy as np
 from numpy.linalg import inv
 from numpy.linalg import norm
 from joblib import Parallel, delayed
-import multiprocessing
+from multiprocessing import Process, Manager, cpu_count
+
+
+class SolveIndividual:
+    def solve(self, A, b, nu, rho, Z):
+        t1 = A.dot(A.T)
+        A = A.reshape(-1, 1)
+        tX = (A * b + rho * Z - nu) / (t1 + rho)
+        return tX
+
+class CombineSolution:
+    def combine(self, nuBar, xBar, Z, rho):
+        t = nuBar.reshape(-1, 1)
+        t = t + rho * (xBar.reshape(-1, 1) - Z)
+        return t.T
+
 
 class ADMM:
     def __init__(self, A, b, parallel = False):
@@ -19,7 +34,7 @@ class ADMM:
         self.b = b
         self.alpha = 0.01
         self.parallel = parallel
-        self.numberOfThreads = multiprocessing.cpu_count()
+        self.numberOfThreads = cpu_count()
 
     def step(self):
         if self.parallel:
@@ -34,19 +49,12 @@ class ADMM:
         self.nu = self.nu + self.rho * (self.X - self.Z)
     
     def solveIndividual(self, i):
-        A = self.A[i]
-        b = np.asscalar(self.b[i])
-        nu = self.nuBar[i].reshape(-1, 1)
-        t1 = A.dot(A.T)
-        A = A.reshape(-1, 1)
-        tX = (A * b + self.rho * self.Z - nu) / (t1 + self.rho)
-        return tX
+        solve = SolveIndividual()
+        return solve.solve(self.A[i], np.asscalar(self.b[i]), self.nuBar[i].reshape(-1, 1), self.rho, self.Z)
 
     def combineSolution(self, i):
-        t = self.nuBar[i].reshape(-1, 1)
-        t = t + self.rho * (self.XBar[i].reshape(-1, 1) - self.Z)
-        self.nuBar[i] = t.T
-
+        combine = CombineSolution()
+        return combine.combine(self.nuBar[i].reshape(-1, 1), self.XBar[i].reshape(-1, 1), self.Z, self.rho)
 
     def step_parallel(self):
         # Solve for X_t+1
