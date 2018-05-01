@@ -2,7 +2,7 @@ import numpy as np
 from numpy.linalg import inv
 from numpy.linalg import norm
 from joblib import Parallel, delayed
-from multiprocessing import Process, Manager, cpu_count
+from multiprocessing import Process, Manager, cpu_count, Pool
 
 
 class SolveIndividual:
@@ -42,12 +42,12 @@ class ADMM:
 
         # Solve for X_t+1
         self.X = inv(self.A.T.dot(self.A) + self.rho).dot(self.A.T.dot(self.b) + self.rho * self.Z - self.nu)
-        
+
         # Solve for Z_t+1
         self.Z = self.X + self.nu / self.rho - (self.alpha / self.rho) *  np.sign(self.Z)
         # Combine
         self.nu = self.nu + self.rho * (self.X - self.Z)
-    
+
     def solveIndividual(self, i):
         solve = SolveIndividual()
         return solve.solve(self.A[i], np.asscalar(self.b[i]), self.nuBar[i].reshape(-1, 1), self.rho, self.Z)
@@ -58,30 +58,47 @@ class ADMM:
 
     def step_parallel(self):
         # Solve for X_t+1
-        Parallel(n_jobs = self.numberOfThreads, backend = "threading")(
-            delayed(self.solveIndividual)(i) for i in range(0, self.N-1))
-        
-        self.X = np.average(self.XBar, axis = 0) 
+        #Parallel(n_jobs = self.numberOfThreads, backend = "threading")(
+        #    delayed(self.solveIndividual)(i) for i in range(0, self.N-1))
+        process = []
+        for i in range(0, self.N-1):
+            p = Process(target = self.solveIndividual, args= (i,))
+            p.start()
+            process.append(p)
+
+        for p in process:
+            p.join()
+
+        self.X = np.average(self.XBar, axis = 0)
         self.nu = np.average(self.nuBar, axis = 0)
-        
+
         self.X = self.X.reshape(-1, 1)
         self.nu = self.nu.reshape(-1, 1)
-        
+
         # Solve for Z_t+1
         self.Z = self.X + self.nu / self.rho - (self.alpha / self.rho) * np.sign(self.Z)
         # Combine
-        Parallel(n_jobs = self.numberOfThreads, backend = "threading")(
-            delayed(self.combineSolution)(i) for i in range(0, self.N-1))
+        #Parallel(n_jobs = self.numberOfThreads, backend = "threading")(
+        #    delayed(self.combineSolution)(i) for i in range(0, self.N-1))
+
+        process = []
+        for i in range(0, self.N-1):
+            p = Process(target = self.combineSolution, args= (i,))
+            p.start()
+            process.append(p)
+
+        for p in process:
+            p.join()
         
     def step_iterative(self):
         # Solve for X_t+1
         for i in range(0, self.N-1):
             t = self.solveIndividual(i)
             self.XBar[i] = t.T
-        
-        self.X = np.average(self.XBar, axis = 0) 
+
+        self.X = np.average(self.XBar, axis = 0)
         self.nu = np.average(self.nuBar, axis = 0)
-        
+
         self.X = self.X.reshape(-1, 1)
         self.nu = self.nu.reshape(-1, 1)
 
