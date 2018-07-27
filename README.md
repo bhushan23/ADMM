@@ -18,6 +18,20 @@ ADMM works in two steps
 We implemented ADMM in PyTorch framework [Click here to view](https://github.com/bhushan23/pytorch/blob/admm/torch/optim/admm.py)
 for Lasso and Ridge regression.
 
+## Results
+### Lasso Solver
+|![Lasso Loss](https://github.com/bhushan23/ADMM/blob/master/results/Lasso.png)|![Lasso Prediction](https://github.com/bhushan23/ADMM/blob/master/results/Compare_Lasso.png)|
+|:---:|:---:|
+|*ADMM Lasso Loss*|*ADMM vs Scikit Lasso Solver*|
+### Ridge regression
+|![Ridge regression Loss](https://github.com/bhushan23/ADMM/blob/master/results/Ridge.png)|![Ridge regression Prediction](https://github.com/bhushan23/ADMM/blob/master/results/Compare_Ridge.png)|
+|:---:|:---:|
+|*ADMM Ridge regression Loss*|*ADMM vs Scikit ridge regression Solver*|
+### ADMM vs Newton vs Gradient Descent
+![Contour Plot of ADMM vs GD vs Newtons method for Lasso Problem](https://github.com/bhushan23/ADMM/blob/master/results/Contour_plot.png)
+
+Contour plot does shows that ADMM reaches to the optimal solution fast and then takes smaller steps as it reaches to near to the solution. Hence, it confirms that ADMM is middle solution to many problems which can solve problems nearly as fast as newton and is not just restricted to quadratic problems.
+
 ## Issues
 1. ADMM needs distributed infrastructure to scale to general problems
 2. Gradient of individual small problems needs to be known in order to divide the problem
