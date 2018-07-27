@@ -31,8 +31,9 @@ for Lasso and Ridge regression.
 [Click here to view Report](https://github.com/bhushan23/ADMM/blob/master/REPORT_ADMM_IN_PYTORCH.pdf)
 
 ## Other resources 
-1. Reading material - By Professor Steven Boyd - http://web.stanford.edu/~boyd/admm.html
-2. Implementation - By Niru Maheswaranathan - https://github.com/nirum/ADMM
-3. General Convex optimization problems implementation - By Stanford Convex Optimization group - https://github.com/cvxgrp/cvxpy
+1. My Convex Optimization assignments - https://github.com/bhushan23/Convex-Optimization
+2. Reading material - By Professor Steven Boyd - http://web.stanford.edu/~boyd/admm.html
+3. Implementation - By Niru Maheswaranathan - https://github.com/nirum/ADMM
+4. General Convex optimization problems implementation - By Stanford Convex Optimization group - https://github.com/cvxgrp/cvxpy
 
 
