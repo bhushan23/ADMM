@@ -6,12 +6,12 @@ Alternating Direction Method of Multiplier is framework for solving objecting fu
 
 ADMM works in two steps
 
-  1. Divie 
-    a. Break down original problem into small problems
-    b. Distribute these small problem to <N> processors / computing resources
+  1. Divide <br> 
+    a. Break down original problem into small problems <br>
+    b. Distribute these small problem to <N> processors / computing resources <br>
     c. Every processor solves the smaller problem
-  2. Conquer
-    a. Combine solution from <N> processors into one
+  2. Conquer <br>
+    a. Combine solution from \<N\> processors into one
     
 
 ## Our work
